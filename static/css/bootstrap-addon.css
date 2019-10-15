@@ -1,0 +1,32 @@
+@media screen and (min-width: 991px) {
+		  .button0 {
+			display: none;
+		  }
+}
+		 
+@media screen and (max-width: 991px) {
+		  .button1 {
+			display: none;
+		  }
+}
+
+.container1{
+				display:flex;
+			}
+			
+.sub1{
+		flex:2;
+}
+			
+.sub2{
+		flex:1;
+}
+.sub2{
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: auto;
+		margin-bottom: auto;
+		vertical-align: middle;
+		text-align:center;
+}

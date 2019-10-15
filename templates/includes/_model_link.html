@@ -1,0 +1,146 @@
+
+<div class="modal" tabindex="-1" role="dialog" id='qrwindow' aria-hidden='true'>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">QR-Code for Link</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style='margin:0 auto; text-align:center;'>
+		<p style='font-size:30px;border:5px solid red;' id='image_loader'><strong>Loading</br>QR</strong></p>
+        <img id="qrcode" src="" alt="Elfin-URL QR-Code" height="250" width="250">
+		<p style='text-align:center;margin-top: 10px;margin-bottom:0px;font-size: 10px;'><strong><em><span id='pqrcode'></span> <span class="far fa-copy" id='pqrcode-copy' style='font-size:20px;cursor:pointer;' data-toggle="tooltip" data-placement="bottom" title="Copy to Clipboard"></span><em></strong></p>
+      </div>
+	  <div id='qr-modal-success' class='alert alert-success' role='alert' style='display:none;font-size: 10px;'></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class='modal fade' id='addWindow' tabindex='-1' role='dialog' aria-labeledby='ModalLinkLabel' aria-hidden='true'>
+	<div class='modal-dialog' role='document'>
+		<div class='modal-content'>
+			<!-- Modal Header -->
+			<div class='modal-header'>
+				<h3 id='h3_title'>Add Link</h3>
+				<button type='button' class='close' data-dismiss='modal'>&times;</button>
+			</div>
+			<!--Modal Body-->
+			<div class='modal-body'>
+				{% from 'includes/_formhelpers.html' import render_feild %}
+				<form method="post" action="{{ url_for('.dashboard') }}" id='uform-add'>
+					<input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+					<!--KeyWord-->
+					<div class='form-group'>
+						<input type='text' id='keyword' name='keyword' class='form-control' placeholder="Key Word" value="{{ request.form.keyword }}"/>
+					</div>
+					<!--Actual Link-->
+					<div class='form-group'>
+						<input type='text' id='link' name='link' class='form-control' placeholder="Link"  value="{{ request.form.link }}"/>
+					</div>
+					<div id='modal-success' class='alert alert-success' role='alert' style='display:none;'></div>
+					<div id='modal-danger' class='alert alert-danger' role='alert' style='display:none;'></div>
+					<hr>
+					
+					<button type='submit' class='btn btn-primary float-right' id='add_submit'>Submit</button>
+				</form>
+		</div>
+	</div>
+</div>
+
+
+
+<script>
+$(document).ready(function() {
+	$('[data-toggle="tooltip"]').tooltip(); 
+	
+	$('#add_link_modal').click(function(event){
+	
+		$("#h3_title").text("Add Link");
+		var kwd = document.getElementById('keyword');
+		var lnk = document.getElementById('link');
+		kwd.value = '';
+		lnk.value = '';
+		$("#keyword").prop('disabled', false);
+		$('#modal-danger').hide();
+		$('#modal-success').hide();
+		$('#addWindow').modal('show');
+	
+	});
+   
+	$('#add_submit').click(function(event) {
+		event.preventDefault();
+		$("#keyword").prop('disabled', false);
+		var url = "{{ url_for('process') }}";
+		$.post(url, data=$('#uform-add').serialize(), function(data){
+			if (data.error){
+						$('#modal-danger').text(data.error).show();
+						$('#modal-success').hide();
+			}
+			else{
+						$("#keyword").prop('disabled', true);
+						$('#modal-success').text(data.data).show();
+						$('#modal-danger').hide();
+						window.setTimeout(function(){
+							window.location.href = "{{ url_for('dashboard') }}";
+
+						}, 2000);
+				}
+		});
+		
+	});
+	
+	$('#qrcode').on('load', function(){
+		// hide/remove the loading image
+		$('#qrcode').show();
+		$('#image_loader').hide();
+	});
+	
+	$('.link_edit_btn').click(function(event){
+		//event.preventDefault();
+		var key = $(this).closest('tr').children('td.modal_keyword').text();
+		var link = $(this).closest('tr').children('td.modal_link').text();
+		$('#addWindow').modal('show');
+		$("#h3_title").text("Edit Link");
+		var kwd = document.getElementById('keyword');
+		var lnk = document.getElementById('link');
+		kwd.value = key;
+		lnk.value = link;
+		$("#keyword").prop('disabled', true);
+		$('#modal-danger').hide();
+		$('#modal-success').hide();
+	
+	});
+	
+	$('.modal_keyword').click(function(event){
+		//event.preventDefault();
+		var url_qr = "{{url_for('home',_external=True)}}"+"{{session.username}}/"+$(this).text();		
+		var qrurl = "{{url_for('home',_external=True)}}"+'gen_qrcode/'+$(this).text()
+		$('#qrcode').attr('src',qrurl);
+		$('#pqrcode').text(url_qr);
+		$('#qr-modal-success').hide();
+		$('#image_loader').show();
+		$('#qrcode').hide();
+		$('#qrwindow').modal('show');
+	
+	});
+	
+	$("#pqrcode-copy").click(function(){
+		var $temp = $("<input>");
+		$("body").append($temp);
+		$temp.val($("#pqrcode").text());
+		$temp.select();
+		$temp.focus();
+		document.execCommand("copy");
+		$temp.remove();
+		$('#qr-modal-success').text("Coppied to clipbard").show();
+	});
+
+  
+});
+</script>

@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+{% block body %}
+	<h1>Dashboard</h1>
+	<h3><small>Welcome "<b>{{ session.Name }}"</b></small></h3>
+	<button type='button' class="btn btn-success" id='add_link_modal'>Add Link</button>
+	<hr>
+	{% if links %}
+	<div class = "table-responsive">
+	<table class='table table-striped'>
+		<tr>
+			<th>ID</th>
+			<th>Key Word</th>
+			<th>Link</th>
+			<th>Visitors</th>
+			<th></th>
+			<th></th>
+		</tr>
+		{% for link in links %}
+		<tr>
+			<td class='modal_id'>{{link.id}}</td>
+			<td class='modal_keyword' style='cursor:pointer;'data-toggle=" tooltip" data-placement="bottom" title="Generate QR code">{{link.keyword}}</td>
+			<td class='modal_link'><a href="{{link.link}}" target="_blank">{{link.link}}</a></td>
+			<td>{{link.visitors}}</td>
+			<td><button type='button' class='btn btn-info float-right link_edit_btn'>Edit</button></td>
+			<td>
+				<form action="{{ url_for('delete_article', keyword=link.keyword)}}" method='post'/>
+				<input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+				<input type='hidden' name="_method" value="DELETE">
+				<input type='submit' value="Delete" class="btn btn-danger">
+				</form>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	</div>
+	{% endif %}
+	{% include 'includes/_model_link.html' %}
+{% endblock %}
+

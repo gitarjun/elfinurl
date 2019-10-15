@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+	<div class="container1">	
+	<div class='sub1'>
+	<h1>Register</h1>
+	{% from 'includes/_formhelpers.html' import render_feild %}
+	<form method="POST" action="">
+		<input name=_csrf_token type=hidden value="{{ csrf_token() }}">
+		<div class="form-group">
+			{{ render_feild(form.name, class_="form-control") }}
+		</div>
+		<div class="form-group">
+			{{ render_feild(form.email, class_="form-control")}}
+		</div>
+		<div class="form-group">
+			{{ render_feild(form.username, class_="form-control") }}
+		</div>
+		<div class="form-group">
+			{{ render_feild(form.password, class_="form-control") }}
+		</div>
+		<div class="form-group">
+			{{ render_feild(form.confirm, class_="form-control") }}
+		</div>
+		<div class="form-group">
+			<div class='float-right'>
+				<input type="checkbox" name="2FA_chekbox" id='2FA' >Two Factor Authentication<br>
+			</div>
+		</div>
+		<div class="form-group">
+			<p><input type='submit' class="btn btn-primary" value="Submit"></p>
+		</div>
+	</form>
+	</div>
+	<div class='sub2' id='reg_qr' style='display:none;'>
+		<img id="qrcode" src="{{ url_for('qrcode') }}" alt="Error in QR" height="200" width="200">
+		<p><b>{{random}}</b></p>
+	</div>
+	</div>
+	
+<script>
+	$('document').ready(function(){
+		$('#2FA').click(function(){
+			$('#reg_qr').toggle(500);
+		});
+		
+	});
+</script>
+	
+{% endblock %}
